@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <!-- 콘솔 출력 설정 -->
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern=" %-5level %c(%M:%L) - %m%n"/>
+        </Console>
+    </Appenders>
+
+    <!-- 로거 설정 -->
+    <Loggers>
+        <!-- 최상위 부모 로거(INFO) -->
+        <Root level="INFO">
+            <AppenderRef ref="console"/>
+        </Root>
+
+        <!-- 애플리케이션 전용 로거 -->
+        <Logger name="org.scoula" level="INFO" additivity="false">
+            <AppenderRef ref="console"/>
+        </Logger>
+
+        <!-- 스프링 프레임워크 로거 -->
+        <Logger name="org.springframework" level="INFO" additivity="false">
+            <AppenderRef ref="console"/>
+        </Logger>
+
+        <!-- JDBC 관련 로거: 대부분 WARN 레벨로 제한 -->
+        <Logger name="jdbc" level="WARN" additivity="false">
+            <AppenderRef ref="console"/>
+        </Logger>
+
+        <!-- SQL만 INFO 레벨로 출력 (핵심 로그) -->
+        <Logger name="jdbc.sqlonly" level="INFO" additivity="false">
+            <AppenderRef ref="console"/>
+        </Logger>
+    </Loggers>
+</Configuration>
