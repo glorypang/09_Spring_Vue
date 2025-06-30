@@ -1,109 +1,76 @@
-<template>
-  <h2>로그인 테스트</h2>
-  <!--로그인 x-->
-  <div v-if="!isLoggedIn">
-    <form @submit.prevent="handleLogin">
-      <div>
-        username :
-        <input type="text" v-model="loginForm.username" />
-      </div>
-      <div>
-        password :
-        <input type="password" v-model="loginForm.password" />
-      </div>
-      <div>
-        <button type="submit">로그인</button>
-      </div>
-    </form>
-  </div>
-  <!-- 로그인 o -->
-  <div v-else>
-    <h1>환영</h1>
-    <p>
-      <strong>사용자명 : {{ userInfo.username }} </strong>
-    </p>
-    <p>
-      <strong>이메일 : {{ userInfo.email }} </strong>
-    </p>
-    <p>
-      <strong>권한 : {{ userInfo.roles }} </strong>
-    </p>
-    <button @click="handleLogout">로그아웃</button>
-  </div>
-</template>
-
 <script setup>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
-//로그인 상태 반응형 데이터
-const isLoggedIn = ref(false);
-//사용자 정보 반응형 데이터
-const userInfo = ref({});
+import { computed, reactive, ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
-//로그인 입력 상태 반응형 데이터(객체)
-const loginForm = ref({
+const router = useRouter();
+const auth = useAuthStore();
+
+// 폼 데이터 관리
+const member = reactive({
   username: '',
   password: '',
 });
-// 로그인 처리 함수
-const handleLogin = async () => {
+
+const error = ref('');
+const disableSubmit = computed(() => !(member.username && member.password));
+
+const login = async () => {
+  console.log(member);
   try {
-    const response = await axios.post('/api/auth/login', loginForm.value);
-    console.log('response.data : ', response.data); // 서버응답 데이터
-
-    //구조 분해 할당
-    const { token, user } = response.data;
-
-    //로컬 스토리지에 토큰 저장
-    localStorage.setItem('authToken', token);
-
-    //로컬 스토리지에 사용자 정보(JSON) 저장
-    localStorage.setItem('userInfo', JSON.stringify(user));
-
-    //상태 업데이트
-    isLoggedIn.value = true;
-
-    //사용자 상태 업데이트
-    userInfo.value = user;
-
-    //로그인 폼에 입력된 값 초기화(v-model)
-    loginForm.value = {
-      username: '',
-      password: '',
-    };
+    await auth.login(member); // 인증 스토어의 login 액션 호출
+    router.push('/'); // 성공 시 홈페이지로 이동
   } catch (e) {
-    console.error(e);
+    console.log('에러=======', e);
+    error.value = e.response.data; // 에러 메시지 표시
   }
 };
-
-//로그아웃 처리 함수
-const handleLogout = () => {
-  //로컬스토리지에서 저장된 내용 비우기
-  // localStorage.clear(); // 모두 지우기
-
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userInfo');
-
-  // 로그인 상태 false로 변경
-  isLoggedIn.value = false;
-};
-
-// // 로그인 상태 확인 함수
-const checkLoginStatus = () => {
-  const token = localStorage.getItem('authToken');
-  const savedUserInfo = localStorage.getItem('userInfo');
-
-  if (token && savedUserInfo) {
-    isLoggedIn.value = true;
-    userInfo.value = JSON.parse(savedUserInfo);
-  } else {
-    isLoggedIn.value = false;
-    userInfo.value = {};
-  }
-};
-
-// // 컴포넌트 마운트 시 로그인 상태 확인
-onMounted(() => {
-  checkLoginStatus();
-});
 </script>
+<template>
+  <div class="mt-5 mx-auto" style="width: 500px">
+    <h1 class="my-5">
+      <i class="fa-solid fa-right-to-bracket"></i>
+      로그인
+    </h1>
+
+    <form @submit.prevent="login">
+      <!-- 사용자 ID 입력 -->
+      <div class="mb-3 mt-3">
+        <label for="username" class="form-label">
+          <i class="fa-solid fa-user"></i> 사용자 ID:
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="사용자 ID"
+          v-model="member.username"
+        />
+      </div>
+
+      <!-- 비밀번호 입력 -->
+      <div class="mb-3">
+        <label for="password" class="form-label">
+          <i class="fa-solid fa-lock"></i> 비밀번호:
+        </label>
+        <input
+          type="password"
+          class="form-control"
+          placeholder="비밀번호"
+          v-model="member.password"
+        />
+      </div>
+
+      <!-- 에러 메시지 표시 -->
+      <div v-if="error" class="text-danger">{{ error }}</div>
+
+      <!-- 로그인 버튼 -->
+      <button
+        type="submit"
+        class="btn btn-primary mt-4"
+        :disabled="disableSubmit"
+      >
+        <i class="fa-solid fa-right-to-bracket"></i> 로그인
+      </button>
+    </form>
+  </div>
+</template>
