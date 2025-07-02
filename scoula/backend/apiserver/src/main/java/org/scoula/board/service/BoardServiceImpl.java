@@ -23,6 +23,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardMapper boardMapper;  // Mapper 의존성 주입
 
+    // 파일 저장될 디렉토리 경로
     private final static String BASE_DIR = "c:/upload/board";
 
     // 목록 조회 서비스
@@ -40,12 +41,15 @@ public class BoardServiceImpl implements BoardService {
     public BoardDTO get(Long no) {
         log.info("get......" + no);
 
-        BoardVO vo = boardMapper.get(no);               // DB에서 VO 조회
+        BoardVO vo = boardMapper.get(no);                // DB에서 VO 조회
         BoardDTO dto = BoardDTO.of(vo);                 // VO → DTO 변환
 
         return Optional.ofNullable(dto)                 // null 안전성 처리
                 .orElseThrow(NoSuchElementException::new);  // 없으면 예외 발생
     }
+
+
+    /* *** CUD 메서드 - 처리된 객체를 반환하도록 변경 *** */
 
     /* create() 메서드 수정 */
     // 게시글 등록 서비스
@@ -67,15 +71,25 @@ public class BoardServiceImpl implements BoardService {
         // 생성된 게시글의 전체 정보를 반환
         return get(vo.getNo());
     }
+
     // 게시글 수정 서비스
     @Override
     public BoardDTO update(BoardDTO board) {
         log.info("update......" + board);
 
         boardMapper.update(board.toVo());  // 게시글 수정 수행
+
+        /* ----- 추가 ----- */
+        // 파일 업로드처리
+        List<MultipartFile>files=board.getFiles();
+        if(files!=null&&!files.isEmpty()){
+            upload(board.getNo(), files);
+        }
+
         // 수정된 게시글 정보를 반환
         return get(board.getNo());
     }
+
 
     // 게시글 삭제 서비스
     @Override
@@ -92,46 +106,9 @@ public class BoardServiceImpl implements BoardService {
         return board;
     }
 
-//    /* create() 메서드 수정 */
-//    // 게시글 등록 서비스
-//    @Transactional  // 여러 DB 작업을 하나의 트랜잭션으로 처리
-//    @Override
-//    public void create(BoardDTO board) {
-//        log.info("create......" + board);
-//
-//        // 1. 게시글 등록
-//        BoardVO vo = board.toVo();         // DTO → VO 변환
-//        boardMapper.create(vo);            // DB에 저장
-//        board.setNo(vo.getNo());           // 생성된 PK를 DTO에 설정
-//
-//        // 2. 첨부파일 처리
-//        List<MultipartFile> files = board.getFiles();
-//        if (files != null && !files.isEmpty()) {
-//            upload(vo.getNo(), files);  // 게시글 번호가 필요하므로 게시글 등록 후 처리
-//        }
-//    }
-
-//    // 게시글 수정 서비스
-//    @Override
-//    public boolean update(BoardDTO board) {
-//        log.info("update......" + board);
-//
-//        int affectedRows = boardMapper.update(board.toVo());  // 영향받은 행 수 반환
-//        return affectedRows == 1;                        // 1개 행이 수정되면 성공
-//    }
+    /* *** CUD 메서드 - 처리된 객체를 반환하도록 변경 *** */
 
 
-//    // 게시글 삭제 서비스
-//    @Override
-//    public boolean delete(Long no) {
-//        log.info("delete...." + no);
-//
-//        int affectedRows = boardMapper.delete(no);     // 삭제된 행 수 반환
-//        return affectedRows == 1;                 // 1개 행이 삭제되면 성공
-//    }
-
-
-    /* 파일 첨부 관련 메서드 추가 */
 
     // 첨부파일 단일 조회
     @Override
@@ -144,6 +121,7 @@ public class BoardServiceImpl implements BoardService {
     public boolean deleteAttachment(Long no) {
         return boardMapper.deleteAttachment(no) == 1;
     }
+
 
     /**
      * 파일 업로드 처리 (private 메서드)

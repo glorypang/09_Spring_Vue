@@ -31,10 +31,11 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
 
     // POST body 문자 인코딩 필터 설정 - UTF-8 설정
     protected Filter[] getServletFilters() {
-        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
-        characterEncodingFilter.setEncoding("UTF-8");
-        characterEncodingFilter.setForceEncoding(true);
-        return new Filter[] {characterEncodingFilter};
+//        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+//        characterEncodingFilter.setEncoding("UTF-8");
+//        characterEncodingFilter.setForceEncoding(true);
+//        return new Filter[] {characterEncodingFilter};
+        return new Filter[]{};
     }
 
     // 📍 파일 업로드 설정 상수
@@ -57,4 +58,6 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
         );
         registration.setMultipartConfig(multipartConfig);
     }
+
+
 }

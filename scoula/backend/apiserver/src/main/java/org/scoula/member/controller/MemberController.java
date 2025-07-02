@@ -3,8 +3,10 @@ package org.scoula.member.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.scoula.common.util.UploadFiles;
+import org.scoula.member.dto.ChangePasswordDTO;
 import org.scoula.member.dto.MemberDTO;
 import org.scoula.member.dto.MemberJoinDTO;
+import org.scoula.member.dto.MemberUpdateDTO;
 import org.scoula.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +43,17 @@ public class MemberController {
         }
 
         UploadFiles.downloadImage(response, file);
+    }
+
+    @PutMapping("/{username}") // PUT 메서드 : 기존 리소스의 완전한 업데이트를 의미
+    public ResponseEntity<MemberDTO> changeProfile(MemberUpdateDTO member) {
+        return ResponseEntity.ok(service.update(member));
+    }
+
+    // 비밀번호 변경
+    @PutMapping("/{username}/changepassword")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        service.changePassword(changePasswordDTO);
+        return ResponseEntity.ok().build();
     }
 }

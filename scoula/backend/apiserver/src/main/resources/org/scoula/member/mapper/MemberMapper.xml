@@ -29,26 +29,42 @@
     <!-- 회원 정보 조회 (LEFT JOIN으로 권한 정보 포함) -->
     <select id="get" resultMap="memberMap">
         SELECT m.username, password, email, reg_date, update_date, auth
-        FROM tbl_member m
-                 LEFT OUTER JOIN tbl_member_auth a ON m.username = a.username
+        FROM scoula_db.tbl_member m
+                 LEFT OUTER JOIN scoula_db.tbl_member_auth a ON m.username = a.username
         WHERE m.username = #{username}
     </select>
 
     <!-- ID 중복 체크용 조회 -->
     <select id="findByUsername" resultType="org.scoula.security.account.domain.MemberVO">
-        SELECT * FROM tbl_member WHERE username = #{username}
+        SELECT * FROM scoula_db.tbl_member WHERE username = #{username}
     </select>
 
     <!-- 회원 정보 저장 -->
     <insert id="insert">
-        INSERT INTO tbl_member
+        INSERT INTO scoula_db.tbl_member
         VALUES(#{username}, #{password}, #{email}, now(), now())
     </insert>
 
     <!-- 권한 정보 저장 -->
     <insert id="insertAuth">
-        INSERT INTO tbl_member_auth(username, auth)
+        INSERT INTO scoula_db.tbl_member_auth(username, auth)
         VALUES(#{username}, #{auth})
     </insert>
 
+    <!-- 회원 정보 수정-->
+    <update id="update">
+        UPDATE scoula_db.tbl_member
+        SET
+        email = #{email},
+        update_date = now()             <!-- 수정 시간 자동 업데이트 -->
+        WHERE username = #{username}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE scoula_db.tbl_member
+        SET
+        password = #{newPassword},      <!-- 암호화된 새 비밀번호 -->
+        update_date = now()            <!-- 수정 시간 자동 업데이트 -->
+        WHERE username = #{username}
+    </update>
 </mapper>

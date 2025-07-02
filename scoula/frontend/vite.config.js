@@ -31,6 +31,7 @@ export default defineConfig({
   // 빌드 설정
   build: {
     outDir:
+
         'C:/Users/dys11/Desktop/KB IT\'s your life/09 Spring - Vue 연동/practice/scoula/backend/apiserver/src/main/webapp/resources',
   },
 });

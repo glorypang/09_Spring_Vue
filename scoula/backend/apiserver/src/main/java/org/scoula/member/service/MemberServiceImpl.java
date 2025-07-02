@@ -2,8 +2,11 @@ package org.scoula.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.scoula.member.dto.ChangePasswordDTO;
 import org.scoula.member.dto.MemberDTO;
 import org.scoula.member.dto.MemberJoinDTO;
+import org.scoula.member.dto.MemberUpdateDTO;
+import org.scoula.member.exception.PasswordMissmatchException;
 import org.scoula.member.mapper.MemberMapper;
 import org.scoula.security.account.domain.AuthVO;
 import org.scoula.security.account.domain.MemberVO;
@@ -77,5 +80,42 @@ public class MemberServiceImpl implements MemberService {
         // 5. 저장된 회원정보 반환
         return get(member.getUsername());
     }
+    // 회원 정보 수정 서비스
+    @Override
+    public MemberDTO update(MemberUpdateDTO member) {
+        // 1. 기존 회원 정보 조회
+        MemberVO vo = mapper.get(member.getUsername());
 
+        // 2. 비밀번호 검증 (보안 핵심 로직)
+        if(!passwordEncoder.matches(member.getPassword(), vo.getPassword())) {
+            throw new PasswordMissmatchException();
+        }
+
+        // 3. 회원정보 업데이트
+        mapper.update(member.toVO());
+
+        // 4. 아바타 이미지 저장
+        saveAvatar(member.getAvatar(), member.getUsername());
+
+        // 5. 업데이트된 정보 반환
+        return get(member.getUsername());
+    }
+
+    // 비밀번호 변경 서비스
+    @Override
+    public void changePassword(ChangePasswordDTO changePassword) {
+        // 1. 사용자 정보 조회
+        MemberVO member = mapper.get(changePassword.getUsername());
+
+        // 2. 기존 비밀번호 검증
+        if(!passwordEncoder.matches(changePassword.getOldPassword(), member.getPassword())) {
+            throw new PasswordMissmatchException();
+        }
+
+        // 3. 새 비밀번호 암호화
+        changePassword.setNewPassword(passwordEncoder.encode(changePassword.getNewPassword()));
+
+        // 4. 데이터베이스 업데이트
+        mapper.updatePassword(changePassword);
+    }
 }

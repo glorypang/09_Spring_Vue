@@ -105,11 +105,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
 
         http
-                .addFilterBefore(encodingFilter(), CsrfFilter.class)// 한글 인코딩 필터 설정
+//                .addFilterBefore(encodingFilter(), CsrfFilter.class)// 한글 인코딩 필터 설정
                 .addFilterBefore(authenticationErrorFilter, UsernamePasswordAuthenticationFilter.class) // 인증 에러 필터
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // Jwt 인증필터
                 .addFilterBefore(jwtUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)  // API 로그인 인증 필터
-
                 // 예외 처리 설정
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)  // 401 에러 처리
@@ -124,11 +123,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // 무상태 모드
 
 
+        // 인증 요구 경로 설정
         http
                 .authorizeRequests() // 경로별 접근 권한 설정
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
-                // 현재는 모든 접근 허용 (개발 단계)
-                .anyRequest().permitAll();
+
+                //.anyRequest().authenticated(); // 현재는 모든 접근 허용 (개발 단계)
+
+                // 회원 관련 인증 요구 경로
+                .antMatchers(HttpMethod.POST, "/api/member").authenticated() // 회원 등록
+                .antMatchers(HttpMethod.PUT, "/api/member", "/api/member/*/changepassword").authenticated() // 회원 정보 수정, 비밀번호 변경
+
+
+                // 게시판 관련 인증 요구 경로
+                .antMatchers(HttpMethod.POST, "/api/board/**").authenticated() // 쓰기
+                .antMatchers(HttpMethod.PUT, "/api/board/**").authenticated()  // 수정
+                .antMatchers(HttpMethod.DELETE, "/api/board/**").authenticated() // 삭제
+
+                .anyRequest().permitAll(); // 나머지 허용
     }
 
 
@@ -165,11 +177,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new CorsFilter(source);
     }
 
-    // 접근 제한 무시 경로 설정
+    // Spring Security 검사를 우회할 경로 설정
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(
-                "/assets/**", "/*", "/api/member/**",
+                "/assets/**",      // 정적 리소스
+                "/*",              // 루트 경로의 파일들
+                // "/api/member/**",   // 회원 관련 공개 API <- 삭제
+
                 // Swagger 관련 URL은 보안에서 제외
                 "/swagger-ui.html", "/webjars/**",
                 "/swagger-resources/**", "/v2/api-docs"

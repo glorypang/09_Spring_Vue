@@ -1,6 +1,11 @@
 <script setup>
+import { useAuthStore } from '@/stores/auth';
+import { computed } from 'vue';
+
 const props = defineProps({ username: String });
-const avatar = `/api/member/${props.username}/avatar`;
+// const avatar = `/api/member/${props.username}/avatar`;
+const auth = useAuthStore();
+const avatar = computed(() => auth.avatarUrl);
 </script>
 
 <template>
