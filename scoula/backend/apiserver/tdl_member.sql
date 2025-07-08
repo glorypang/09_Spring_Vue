@@ -64,3 +64,5 @@ CREATE TABLE tbl_board_attachment (
     -- 외래키 제약조건: 게시글 삭제 시 첨부파일도 함께 삭제
                                       CONSTRAINT FOREIGN KEY (bno) REFERENCES tbl_board (no) ON DELETE CASCADE
 );
+
+

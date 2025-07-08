@@ -13,20 +13,24 @@ const router = useRouter();
 const no = cr.params.no; // URL 파라미터에서 게시글 번호 추출
 const article = ref({});
 
-// 페이지 이동 함수들
+// 목록으로 돌아가기
 const back = () => {
-  router.push({ name: 'board/list' });
+  router.push({ name: 'board/list', query: cr.query });
 };
 
+// 수정 페이지로 이동
 const update = () => {
-  router.push({ name: 'board/update', params: { no: no } });
+  router.push({
+    name: 'board/update',
+    params: { no: no },
+    query: cr.query,
+  });
 };
-
-// 게시글 삭제
+// 삭제 후 목록으로
 const remove = async () => {
   if (!confirm('삭제할까요?')) return;
   await api.delete(no);
-  router.push({ name: 'board/list' });
+  router.push({ name: 'board/list', query: cr.query });
 };
 
 // 파일 다운로드

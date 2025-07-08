@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.scoula.board.domain.BoardAttachmentVO;
 import org.scoula.board.dto.BoardDTO;
 import org.scoula.board.service.BoardService;
+import org.scoula.common.pagination.Page;
+import org.scoula.common.pagination.PageRequest;
 import org.scoula.common.util.UploadFiles;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,18 +30,26 @@ public class BoardController {
 
     private final BoardService service; // 의존성 주입
 
-    @ApiOperation(value = "게시글 목록 조회", notes = "게시글 목록을 얻는 API")
+    /**
+     * 페이징된 게시글 목록 조회
+     * GET: http://localhost:8080/api/board?page=1&amount=10
+     * @param pageRequest 쿼리스트링이 자동 바인딩된 커맨드 객체
+     * @return ResponseEntity
+     *         - 200 OK: 목록 조회 성공, 페이징 처리된 게시글 리스트 반환 (빈 리스트 포함)
+     *         - 204 No Content: 조회 성공했지만 게시글이 하나도 없음
+     *         - 500 Internal Server Error: 서버 내부 오류 (DB 연결 실패 등)
+     */
+    @ApiOperation(value = "게시글 목록 조회(Pagination)", notes = "페이징 처리된 게시글 목록을 얻는 API")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "성공적으로 요청이 처리되었습니다.", response = BoardDTO.class),
             @ApiResponse(code = 400, message = "잘못된 요청입니다."),
             @ApiResponse(code = 500, message = "서버에서 오류가 발생했습니다.")
     })
     @GetMapping("")
-    public ResponseEntity<List<BoardDTO>> getList() {
-        log.info("============> 게시글 전체 목록 조회");
-
-        List<BoardDTO> list = service.getList();
-        return ResponseEntity.ok(list); // 200 OK + 데이터 반환
+    public ResponseEntity<Page> getList(
+            @ApiParam(value = "페이지네이션 요청 객체", required = true) PageRequest pageRequest) {
+        Page<BoardDTO> result = service.getPage(pageRequest);
+        return ResponseEntity.ok(result);
     }
 
     @ApiOperation(value = "상세정보 얻기", notes = "게시글 상세 정보를 얻는 API")

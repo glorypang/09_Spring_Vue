@@ -12,9 +12,13 @@ const attachments = ref([]); // 첨부파일 목록
 const orgArticle = ref({}); // 원본 게시글 데이터 (리셋용)
 const files = ref(null);
 
-// 뒤로가기
+// 취소 버튼 - 상세 페이지로 복귀
 const back = () => {
-  router.push({ name: 'board/detail', params: { no } });
+  router.push({
+    name: 'board/detail',
+    params: { no },
+    query: cr.query,
+  });
 };
 
 // 첨부파일 삭제
@@ -27,7 +31,7 @@ const removeFile = async (fileNo, filename) => {
   attachments.value.splice(ix, 1);
 };
 
-// 폼 제출
+// 폼 제출, 수정 완료 후 상세 페이지로 이동
 const submit = async () => {
   if (!confirm('수정할까요?')) return;
 
@@ -36,7 +40,11 @@ const submit = async () => {
   }
 
   await boardApi.update(article);
-  router.push({ name: 'board/detail', params: { no }, query: cr.query });
+  router.push({
+    name: 'board/detail',
+    params: { no },
+    query: cr.query,
+  });
 };
 
 // 입력값 초기화

@@ -5,14 +5,59 @@
   font-family: 'Noto Sans KR';
 }
 
-
-/* 아바타 스타일 처리리 */ 
+/* 아바타 스타일 처리리 */
 .avatar {
-  border-radius: 50%;                    /* 원형 모양 */
+  border-radius: 50%; /* 원형 모양 */
   border-color: gray;
-  background-color: #d8d8d8;             /* 로딩 중 배경색 */
+  background-color: #d8d8d8; /* 로딩 중 배경색 */
 }
 
-.avatar-sm { width: 20px; height: 20px; }  /* 소형 아바타 */
-.avatar-md { width: 40px; height: 40px; }  /* 중형 아바타 */
-.avatar-lg { width: 80px; height: 80px; }  /* 대형 아바타 */
+.avatar-sm {
+  width: 20px;
+  height: 20px;
+} /* 소형 아바타 */
+.avatar-md {
+  width: 40px;
+  height: 40px;
+} /* 중형 아바타 */
+.avatar-lg {
+  width: 80px;
+  height: 80px;
+} /* 대형 아바타 */
+
+/* 페이지네이션 컨테이너 스타일 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  /* column-gap: 10px; */ /* 필요시 간격 조정 */
+}
+
+/* 페이지네이션 버튼 기본 스타일 */
+.paginate-buttons {
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+  background-color: white;
+  border: 1px solid white;
+  color: black;
+  transition: all 0.2s ease; /* 부드러운 전환 효과 */
+}
+
+/* 호버 효과 */
+.paginate-buttons:hover {
+  border-radius: 20px;
+  background-color: #d8d8d8;
+}
+
+/* 활성 페이지 스타일 */
+.active-page {
+  border-radius: 20px;
+  background-color: #3498db;
+  border: 1px solid #3498db;
+  color: white;
+}
+
+/* 활성 페이지 호버 효과 */
+.active-page:hover {
+  background-color: #2988c8;
+}

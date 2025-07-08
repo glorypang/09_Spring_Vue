@@ -15,6 +15,7 @@ import org.springframework.web.servlet.view.JstlView;
         "org.scoula.controller",
         "org.scoula.board.controller",
         "org.scoula.member.controller",
+        "org.scoula.travel.controller"  // 여행지 컨트롤러 스캔
 })
 public class ServletConfig implements WebMvcConfigurer {
 

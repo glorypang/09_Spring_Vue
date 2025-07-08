@@ -32,6 +32,8 @@ const submit = async () => {
 
   await boardApi.create(article);
   router.push('/board/list');
+  // const resultData = await boardApi.create(article);
+  // console.log("no: ")
 };
 </script>
 <template>

@@ -1,4 +1,5 @@
 // 게시판 라우팅
+import { isAuthenticated } from '@/util/guards';
 
 export default [
   // 게시글 목록 조회
@@ -27,5 +28,17 @@ export default [
     path: '/board/update/:no', // 수정할 게시글 번호 전달
     name: 'board/update',
     component: () => import('../pages/board/BoardUpdatePage.vue'),
+  },
+  {
+    path: '/board/create',
+    name: 'board/create',
+    component: () => import('../pages/board/BoardCreatePage.vue'),
+    beforeEnter: isAuthenticated, // 글쓰기 페이지 보호
+  },
+  {
+    path: '/board/update/:no',
+    name: 'board/update',
+    component: () => import('../pages/board/BoardUpdatePage.vue'),
+    beforeEnter: isAuthenticated, // 글수정 페이지 보호
   },
 ];

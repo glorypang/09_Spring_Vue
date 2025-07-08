@@ -28,11 +28,15 @@ import javax.sql.DataSource;
 @PropertySource({"classpath:/application.properties"})
 @MapperScan(basePackages = {
         "org.scoula.board.mapper",
-        "org.scoula.member.mapper"  // 회원 매퍼 스캔
+        "org.scoula.member.mapper",  // 회원 매퍼 스캔
+        "org.scoula.travel.mapper"   // 여행지 매퍼 스캔
+
 })
 @ComponentScan(basePackages = {
         "org.scoula.board.service",
-        "org.scoula.member.service"  // 회원 서비스 스캔
+        "org.scoula.member.service",  // 회원 서비스 스캔
+        "org.scoula.travel.service"   // 여행지 서비스 스캔
+
 })@Log4j2
 @EnableTransactionManagement
 
